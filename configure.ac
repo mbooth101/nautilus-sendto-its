@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(nautilus-sendto-trac, 0.1, http://www.matbooth.co.uk/trac/)
+AC_INIT(nautilus-sendto-trac, 0.1, http://www.matbooth.co.uk/trac/wiki/NautilusSendtoTracStart)
 
 
 AC_CANONICAL_SYSTEM
