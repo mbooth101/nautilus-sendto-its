@@ -23,8 +23,22 @@
 
 #include <nautilus-sendto-plugin.h>
 #include <libsoup/soup.h>
+#include <gnome-keyring.h>
+
+static const GnomeKeyringPasswordSchema http_auth_password_schema =
+{
+	GNOME_KEYRING_ITEM_GENERIC_SECRET,
+	{
+		{ "host",  GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
+		{ "realm", GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
+		{ "user",  GNOME_KEYRING_ATTRIBUTE_TYPE_STRING },
+		{ NULL, 0 }
+	}
+};
+const GnomeKeyringPasswordSchema *HTTP_AUTH_SCHEMA = &http_auth_password_schema;
 
 static SoupSession *session = NULL;
+
 static GtkWidget *url_field = NULL;
 static GtkWidget *ticket_field = NULL;
 
@@ -88,14 +102,93 @@ static gchar* send_xmlrpc (const gchar *uri, const gchar *method, GValue *result
 	return NULL;
 }
 
+static GtkWidget* get_credentials_dialog (const gchar* default_username, GtkWidget **user_field, GtkWidget **pass_field)
+{
+	GtkWidget *dialog = gtk_dialog_new_with_buttons("Authentication Required", NULL, GTK_DIALOG_MODAL,
+			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+			NULL);
+	GtkWidget *credentials_widget = gtk_table_new(2, 2, FALSE);
+	GtkWidget *user_label = gtk_label_new("Username:");
+	*user_field = gtk_entry_new();
+	GtkWidget *pass_label = gtk_label_new("Password:");
+	*pass_field = gtk_entry_new();
+
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), user_label, 0, 1, 0, 1);
+	gtk_widget_show (user_label);
+
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *user_field, 1, 2, 0, 1);
+	gtk_widget_show (*user_field);
+	gtk_entry_set_text(GTK_ENTRY(*user_field), default_username);
+
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), pass_label, 0, 1, 1, 2);
+	gtk_widget_show (pass_label);
+
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *pass_field, 1, 2, 1, 2);
+	gtk_widget_show (*pass_field);
+	gtk_entry_set_visibility(GTK_ENTRY(*pass_field), FALSE);
+
+	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), credentials_widget, TRUE, TRUE, 0);
+	gtk_widget_show (credentials_widget);
+
+	return dialog;
+}
+
 static void session_authenticate (SoupSession *session, SoupMessage *msg, SoupAuth *auth, gboolean retrying, gpointer user_data)
 {
+	GnomeKeyringResult result;
+	gchar *user = NULL;
+	gchar *password = NULL;
+
+	// Get the previous user name that was used for this uri
+	// TODO Gconf stuff
+
+	// There wasn't one, so let's use the logged in user's name
+	if (!user)
+		user = g_strdup(getenv("USER"));
+
 	if (retrying)
 	{
-		handle_error(NULL, "unable to authenticate");
-		return;
+		// Prompt the user if there were no valid credentials in the keyring
+		GtkWidget *user_field = NULL;
+		GtkWidget *pass_field = NULL;
+		GtkWidget *dialog = get_credentials_dialog(user, &user_field, &pass_field);
+		gint response = gtk_dialog_run(GTK_DIALOG (dialog));
+		if (response == GTK_RESPONSE_REJECT)
+		{
+			gtk_widget_destroy(dialog);
+			return;
+		}
+		g_free(user);
+		user = g_strdup(gtk_entry_get_text(GTK_ENTRY(user_field)));
+		password = g_strdup(gtk_entry_get_text(GTK_ENTRY(pass_field)));
+		gtk_widget_destroy(dialog);
+
+		// Store password in the keyring
+		gchar * description = g_strdup_printf("Nautilus-Sendto-Trac:%s:%s", soup_auth_get_host(auth), soup_auth_get_realm(auth));
+		result = gnome_keyring_store_password_sync(HTTP_AUTH_SCHEMA, NULL, description, password,
+				"host", soup_auth_get_host(auth),
+				"realm", soup_auth_get_realm(auth),
+				"user", user,
+				NULL);
+		g_free(description);
+		g_free(password);
 	}
-	soup_auth_authenticate (auth, "mbooth", "beans");
+
+	// Try and get a password for the user from the keyring
+	result = gnome_keyring_find_password_sync(HTTP_AUTH_SCHEMA, &password,
+			"host", soup_auth_get_host(auth),
+			"realm", soup_auth_get_realm(auth),
+			"user", user,
+			NULL);
+	if (result != GNOME_KEYRING_RESULT_OK)
+		password = "";
+
+	// Do the authentication
+	soup_auth_authenticate(auth, user, password);
+	g_free(user);
+	if (result == GNOME_KEYRING_RESULT_OK)
+		gnome_keyring_free_password(password);
 	return;
 }
 
@@ -151,6 +244,7 @@ static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 	gtk_table_attach_defaults (GTK_TABLE (contact_widget), url_field, 1, 2, 0, 1);
 	gtk_widget_show (url_field);
 	gtk_entry_set_text(GTK_ENTRY(url_field), "http://sources/trac/xmlrpc");
+	// TODO get last uri from Gconf
 
 	gtk_table_attach_defaults (GTK_TABLE (contact_widget), ticket_label, 0, 1, 1, 2);
 	gtk_widget_show (ticket_label);
