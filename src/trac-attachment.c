@@ -102,37 +102,46 @@ static gchar* send_xmlrpc (const gchar *uri, const gchar *method, GValue *result
 	return NULL;
 }
 
-static GtkWidget* get_credentials_dialog (const gchar* default_username, GtkWidget **user_field, GtkWidget **pass_field)
+static GtkWidget* get_credentials_dialog (const gchar* default_username, const gchar* realm, const gchar* host, GtkWidget **user_field, GtkWidget **pass_field)
 {
 	GtkWidget *dialog = gtk_dialog_new_with_buttons("Authentication Required", NULL, GTK_DIALOG_MODAL,
-			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
+			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 			NULL);
+	gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
 	gtk_window_set_icon_name(GTK_WINDOW(dialog), "document-send");
 
-	GtkWidget *credentials_widget = gtk_table_new(2, 2, FALSE);
+	gchar message[1024];
+	g_snprintf(message, 1024, "Authentication required by host %s\nfor \"%s\":", host, realm);
+
+	GtkWidget *credentials_widget = gtk_table_new(3, 2, FALSE);
+	GtkWidget *image = gtk_image_new_from_stock(GTK_STOCK_DIALOG_AUTHENTICATION, GTK_ICON_SIZE_DIALOG);
+	GtkWidget *message_label = gtk_label_new(message);
 	GtkWidget *user_label = gtk_label_new("Username:");
 	*user_field = gtk_entry_new();
 	GtkWidget *pass_label = gtk_label_new("Password:");
 	*pass_field = gtk_entry_new();
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), user_label, 0, 1, 0, 1);
-	gtk_widget_show (user_label);
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), image, 0, 1, 0, 1);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *user_field, 1, 2, 0, 1);
-	gtk_widget_show (*user_field);
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), message_label, 1, 2, 0, 1);
+
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), user_label, 0, 1, 1, 2);
+
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *user_field, 1, 2, 1, 2);
 	gtk_entry_set_text(GTK_ENTRY(*user_field), default_username);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), pass_label, 0, 1, 1, 2);
-	gtk_widget_show (pass_label);
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), pass_label, 0, 1, 2, 3);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *pass_field, 1, 2, 1, 2);
-	gtk_widget_show (*pass_field);
+	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *pass_field, 1, 2, 2, 3);
 	gtk_entry_set_visibility(GTK_ENTRY(*pass_field), FALSE);
 	gtk_widget_grab_focus(*pass_field);
 
 	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), credentials_widget, TRUE, TRUE, 0);
-	gtk_widget_show (credentials_widget);
+	gtk_table_set_row_spacings (GTK_TABLE(credentials_widget), 6);
+	gtk_table_set_col_spacings (GTK_TABLE(credentials_widget), 12);
+	gtk_container_set_border_width(GTK_CONTAINER(credentials_widget), 5);
+	gtk_widget_show_all (credentials_widget);
 
 	return dialog;
 }
@@ -155,7 +164,7 @@ static void session_authenticate (SoupSession *session, SoupMessage *msg, SoupAu
 		// Prompt the user if there were no valid credentials in the keyring
 		GtkWidget *user_field = NULL;
 		GtkWidget *pass_field = NULL;
-		GtkWidget *dialog = get_credentials_dialog(user, &user_field, &pass_field);
+		GtkWidget *dialog = get_credentials_dialog(user, soup_auth_get_realm(auth), soup_auth_get_host(auth), &user_field, &pass_field);
 		gint response = gtk_dialog_run(GTK_DIALOG (dialog));
 		if (response == GTK_RESPONSE_REJECT)
 		{
@@ -255,6 +264,9 @@ static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 	gtk_table_attach_defaults (GTK_TABLE (contact_widget), ticket_field, 1, 2, 1, 2);
 	gtk_widget_show (ticket_field);
 	g_signal_connect (G_OBJECT (ticket_field), "insert-text", G_CALLBACK (ticket_insert_text), NULL);
+
+	gtk_table_set_row_spacings (GTK_TABLE(contact_widget), 6);
+	gtk_table_set_col_spacings (GTK_TABLE(contact_widget), 12);
 
 	return contact_widget;
 }
