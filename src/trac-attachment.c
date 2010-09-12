@@ -108,6 +108,8 @@ static GtkWidget* get_credentials_dialog (const gchar* default_username, GtkWidg
 			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
 			NULL);
+	gtk_window_set_icon_name(GTK_WINDOW(dialog), "document-send");
+
 	GtkWidget *credentials_widget = gtk_table_new(2, 2, FALSE);
 	GtkWidget *user_label = gtk_label_new("Username:");
 	*user_field = gtk_entry_new();
@@ -127,6 +129,7 @@ static GtkWidget* get_credentials_dialog (const gchar* default_username, GtkWidg
 	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *pass_field, 1, 2, 1, 2);
 	gtk_widget_show (*pass_field);
 	gtk_entry_set_visibility(GTK_ENTRY(*pass_field), FALSE);
+	gtk_widget_grab_focus(*pass_field);
 
 	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), credentials_widget, TRUE, TRUE, 0);
 	gtk_widget_show (credentials_widget);
