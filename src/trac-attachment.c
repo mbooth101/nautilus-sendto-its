@@ -24,6 +24,10 @@
 #include <nautilus-sendto-plugin.h>
 #include <libsoup/soup.h>
 #include <gnome-keyring.h>
+#include <gconf/gconf-client.h>
+
+// Gconf setting keys
+#define LAST_TRAC_URI "/desktop/gnome/nautilus-sendto-trac/last_trac_uri"
 
 static const GnomeKeyringPasswordSchema http_auth_password_schema =
 {
@@ -228,7 +232,7 @@ static void ticket_insert_text (GtkEditable *editable, gchar *new_text, gint new
 	// Don't let the default signal handler run
 	g_signal_stop_emission_by_name (G_OBJECT (editable), "insert-text");
 
-	g_free(result);
+	g_free (result);
 }
 
 static gboolean init (NstPlugin *plugin)
@@ -246,6 +250,12 @@ static gboolean init (NstPlugin *plugin)
 
 static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 {
+	// Get last used uri from gconf
+	GConfClient* client = gconf_client_get_default ();
+	gchar* uri = gconf_client_get_string (client, LAST_TRAC_URI, NULL);
+	g_object_unref (client);
+
+	// Do widget layout stuff
 	GtkWidget *contact_widget = gtk_table_new (2, 2, FALSE);
 	GtkWidget *url_label = gtk_label_new ("Trac URI:");
 	GtkWidget *ticket_label = gtk_label_new ("Ticket #:");
@@ -255,8 +265,15 @@ static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 
 	gtk_table_attach (GTK_TABLE (contact_widget), url_field, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (url_field);
-	gtk_entry_set_text(GTK_ENTRY(url_field), "http://sources/trac/xmlrpc");
-	// TODO get last uri from Gconf
+	if (uri != NULL && *uri != '\0')
+	{
+		gtk_entry_set_text(GTK_ENTRY(url_field), uri);
+	}
+	else
+	{
+		gtk_entry_set_text(GTK_ENTRY(url_field), "http://localhost/trac/xmlrpc");
+	}
+	g_free (uri);
 
 	gtk_table_attach (GTK_TABLE (contact_widget), ticket_label, 0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (ticket_label);
@@ -297,14 +314,19 @@ static gboolean validate_destination (NstPlugin *plugin, GtkWidget *contact_widg
 			G_TYPE_INT, strtol(gtk_entry_get_text(GTK_ENTRY(ticket_field)), NULL, 10),
 			G_TYPE_INVALID);
 
-	g_free(uri);
-
 	if (err)
 	{
+		g_free (uri);
 		*error = err;
 		return FALSE;
 	}
 
+	// Save to gconf as last used uri
+	GConfClient* client = gconf_client_get_default ();
+	gconf_client_set_string (client, LAST_TRAC_URI, uri, NULL);
+	g_object_unref (client);
+
+	g_free (uri);
 	return TRUE;
 }
 
@@ -358,7 +380,7 @@ static gboolean send_files (NstPlugin *plugin, GtkWidget *contact_widget, GList 
 		if (err)
 		{
 			handle_error(NULL, err);
-			g_free(err);
+			g_free (err);
 			g_object_unref (source);
 			return FALSE;
 		}

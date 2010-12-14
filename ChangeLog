@@ -1,0 +1,11 @@
+2010-12-14  Mat Booth  <mbooth@fedoraproject.org>
+
+	- 0.2
+	* Now remembers the last Trac URI that was used.
+
+2010-09-12  Mat Booth  <mbooth@fedoraproject.org>
+
+	- 0.1
+	* Initial version.
+	* Uploads attachments to Trac tickets.
+	* Prompts for and remembers authentication details.

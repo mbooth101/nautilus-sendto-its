@@ -1,7 +1,7 @@
 dnl Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.59)
-AC_INIT(Nautilus-Sendto-Trac, 0.1, \
+AC_INIT(Nautilus-Sendto-Trac, 0.2, \
 mbooth@fedoraproject.org, nautilus-sendto-trac, \
 http://www.matbooth.co.uk/trac/wiki/NautilusSendtoTracStart)
 
@@ -16,10 +16,12 @@ AC_PROG_LIBTOOL
 NAUTILUS_SENDTO_REQUIRED=2.28.0
 SOUP_REQUIRED=2.28.0
 KEYRING_REQUIRED=2.22.0
+GCONF_REQUIRED=2.13.0
 
 PKG_CHECK_MODULES(NAUTILUS_SENDTO, nautilus-sendto >= $NAUTILUS_SENDTO_REQUIRED)
 PKG_CHECK_MODULES(SOUP, libsoup-2.4 >= $SOUP_REQUIRED)
 PKG_CHECK_MODULES(KEYRING, gnome-keyring-1 >= $KEYRING_REQUIRED)
+PKG_CHECK_MODULES(GCONF, gconf-2.0 >= $GCONF_REQUIRED)
 
 AC_CONFIG_FILES(Makefile src/Makefile)
 AC_OUTPUT
