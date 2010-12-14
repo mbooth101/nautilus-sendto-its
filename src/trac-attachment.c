@@ -250,18 +250,18 @@ static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 	GtkWidget *url_label = gtk_label_new ("Trac URI:");
 	GtkWidget *ticket_label = gtk_label_new ("Ticket #:");
 
-	gtk_table_attach_defaults (GTK_TABLE (contact_widget), url_label, 0, 1, 0, 1);
+	gtk_table_attach (GTK_TABLE (contact_widget), url_label, 0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (url_label);
 
-	gtk_table_attach_defaults (GTK_TABLE (contact_widget), url_field, 1, 2, 0, 1);
+	gtk_table_attach (GTK_TABLE (contact_widget), url_field, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (url_field);
 	gtk_entry_set_text(GTK_ENTRY(url_field), "http://sources/trac/xmlrpc");
 	// TODO get last uri from Gconf
 
-	gtk_table_attach_defaults (GTK_TABLE (contact_widget), ticket_label, 0, 1, 1, 2);
+	gtk_table_attach (GTK_TABLE (contact_widget), ticket_label, 0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (ticket_label);
 
-	gtk_table_attach_defaults (GTK_TABLE (contact_widget), ticket_field, 1, 2, 1, 2);
+	gtk_table_attach (GTK_TABLE (contact_widget), ticket_field, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (ticket_field);
 	g_signal_connect (G_OBJECT (ticket_field), "insert-text", G_CALLBACK (ticket_insert_text), NULL);
 
