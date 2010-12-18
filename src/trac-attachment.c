@@ -402,11 +402,10 @@ static gboolean destroy (NstPlugin *plugin)
 
 static NstPluginInfo plugin_info =
 {
-	"stock_internet",
+	"applications-internet",
 	"trac-attachment",
 	"Trac Attachment",
 	NULL,
-	FALSE,
 	NAUTILUS_CAPS_NONE,
 	init,
 	get_contacts_widget,
