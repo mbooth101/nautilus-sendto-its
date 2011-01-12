@@ -112,6 +112,7 @@ static GtkWidget* get_credentials_dialog (const gchar* default_username, const g
 			GTK_STOCK_CANCEL, GTK_RESPONSE_REJECT,
 			GTK_STOCK_OK, GTK_RESPONSE_ACCEPT,
 			NULL);
+	GtkWidget *dialog_content = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
 	gtk_container_set_border_width(GTK_CONTAINER(dialog), 5);
 	gtk_window_set_icon_name(GTK_WINDOW(dialog), "document-send");
 
@@ -126,25 +127,25 @@ static GtkWidget* get_credentials_dialog (const gchar* default_username, const g
 	GtkWidget *pass_label = gtk_label_new("Password:");
 	*pass_field = gtk_entry_new();
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), image, 0, 1, 0, 1);
+	gtk_table_attach (GTK_TABLE (credentials_widget), image, 0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), message_label, 1, 2, 0, 1);
+	gtk_table_attach (GTK_TABLE (credentials_widget), message_label, 1, 2, 0, 1, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), user_label, 0, 1, 1, 2);
+	gtk_table_attach (GTK_TABLE (credentials_widget), user_label, 0, 1, 1, 2, GTK_FILL, GTK_FILL, 0, 0);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *user_field, 1, 2, 1, 2);
-	gtk_entry_set_text(GTK_ENTRY(*user_field), default_username);
+	gtk_table_attach (GTK_TABLE (credentials_widget), *user_field, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+	gtk_entry_set_text (GTK_ENTRY (*user_field), default_username);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), pass_label, 0, 1, 2, 3);
+	gtk_table_attach (GTK_TABLE (credentials_widget), pass_label, 0, 1, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
 
-	gtk_table_attach_defaults (GTK_TABLE (credentials_widget), *pass_field, 1, 2, 2, 3);
-	gtk_entry_set_visibility(GTK_ENTRY(*pass_field), FALSE);
-	gtk_widget_grab_focus(*pass_field);
+	gtk_table_attach (GTK_TABLE (credentials_widget), *pass_field, 1, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+	gtk_entry_set_visibility (GTK_ENTRY (*pass_field), FALSE);
+	gtk_widget_grab_focus (*pass_field);
 
-	gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox), credentials_widget, TRUE, TRUE, 0);
+	gtk_box_pack_start (GTK_BOX (dialog_content), credentials_widget, TRUE, TRUE, 0);
 	gtk_table_set_row_spacings (GTK_TABLE(credentials_widget), 6);
 	gtk_table_set_col_spacings (GTK_TABLE(credentials_widget), 12);
-	gtk_container_set_border_width(GTK_CONTAINER(credentials_widget), 5);
+	gtk_container_set_border_width (GTK_CONTAINER (credentials_widget), 5);
 	gtk_widget_show_all (credentials_widget);
 
 	return dialog;
