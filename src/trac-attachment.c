@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2010 Mat Booth
+ * Copyright (C) 2010,2011 Mat Booth
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
@@ -45,6 +45,7 @@ static SoupSession *session = NULL;
 
 static GtkWidget *url_field = NULL;
 static GtkWidget *ticket_field = NULL;
+static GtkWidget *description_field = NULL;
 
 static void handle_error(GError *error, const char* message)
 {
@@ -245,6 +246,7 @@ static gboolean init (NstPlugin *plugin)
 
 	url_field = gtk_entry_new ();
 	ticket_field = gtk_entry_new ();
+	description_field = gtk_entry_new ();
 
 	return TRUE;
 }
@@ -260,6 +262,7 @@ static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 	GtkWidget *contact_widget = gtk_table_new (2, 2, FALSE);
 	GtkWidget *url_label = gtk_label_new ("Trac URI:");
 	GtkWidget *ticket_label = gtk_label_new ("Ticket #:");
+	GtkWidget *description_label = gtk_label_new ("Comment:");
 
 	gtk_table_attach (GTK_TABLE (contact_widget), url_label, 0, 1, 0, 1, GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (url_label);
@@ -282,6 +285,12 @@ static GtkWidget* get_contacts_widget (NstPlugin *plugin)
 	gtk_table_attach (GTK_TABLE (contact_widget), ticket_field, 1, 2, 1, 2, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
 	gtk_widget_show (ticket_field);
 	g_signal_connect (G_OBJECT (ticket_field), "insert-text", G_CALLBACK (ticket_insert_text), NULL);
+
+	gtk_table_attach (GTK_TABLE (contact_widget), description_label, 0, 1, 2, 3, GTK_FILL, GTK_FILL, 0, 0);
+	gtk_widget_show (description_label);
+
+	gtk_table_attach (GTK_TABLE (contact_widget), description_field, 1, 2, 2, 3, GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 0);
+	gtk_widget_show (description_field);
 
 	gtk_table_set_row_spacings (GTK_TABLE(contact_widget), 6);
 	gtk_table_set_col_spacings (GTK_TABLE(contact_widget), 12);
@@ -370,7 +379,7 @@ static gboolean send_files (NstPlugin *plugin, GtkWidget *contact_widget, GList 
 		gchar *err = send_xmlrpc(gtk_entry_get_text(GTK_ENTRY(url_field)), "ticket.putAttachment", &result,
 				G_TYPE_INT, strtol(gtk_entry_get_text(GTK_ENTRY(ticket_field)), NULL, 10),
 				G_TYPE_STRING, g_file_get_basename(source),
-				G_TYPE_STRING, "",
+				G_TYPE_STRING, gtk_entry_get_text(GTK_ENTRY(description_field)),
 				SOUP_TYPE_BYTE_ARRAY, data,
 				G_TYPE_BOOLEAN, TRUE,
 				G_TYPE_INVALID);
@@ -395,6 +404,7 @@ static gboolean destroy (NstPlugin *plugin)
 {
 	gtk_widget_destroy (url_field);
 	gtk_widget_destroy (ticket_field);
+	gtk_widget_destroy (description_field);
 
 	soup_session_abort (session);
 	g_object_unref (session);
