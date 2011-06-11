@@ -1,3 +1,8 @@
+2011-06-11  Mat Booth  <mbooth@fedoraproject.org>
+
+	- 0.4
+	* Allow an optional comment to be set describing the attachment.
+
 2011-01-12  Mat Booth  <mbooth@fedoraproject.org>
 
 	- 0.3.1
