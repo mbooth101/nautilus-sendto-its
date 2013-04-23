@@ -1,16 +1,1 @@
-Building from Source
-====================
-
-Download the source and verify its integrity:
-
-  $ wget http://www.matbooth.co.uk/archive/nautilus-sendto-trac-0.4.tar.gz
-  $ wget http://www.matbooth.co.uk/archive/nautilus-sendto-trac-0.4.sha256sum
-  $ sha256sum -c nautilus-sendto-trac-0.4.sha256sum
-
-Untar and build:
-
-  $ tar xvf nautilus-sendto-trac-0.4.tar.gz
-  $ cd nautilus-sendto-trac-0.4
-  $ ./configure
-  $ make
-  $ sudo make install
+See README
