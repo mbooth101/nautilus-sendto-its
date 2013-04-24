@@ -27,7 +27,7 @@
 #include <gconf/gconf-client.h>
 
 // Gconf setting keys
-#define LAST_TRAC_URI "/desktop/gnome/nautilus-sendto-trac/last_trac_uri"
+#define LAST_TRAC_URI "/desktop/gnome/nautilus-sendto-its/last_trac_uri"
 
 static const GnomeKeyringPasswordSchema http_auth_password_schema =
 {

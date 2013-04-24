@@ -1,7 +1,9 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.59)
-AC_INIT(Nautilus-Sendto-Trac, 0.4, mbooth@fedoraproject.org, nautilus-sendto-trac, http://www.matbooth.co.uk/trac/wiki/NautilusSendtoTracStart)
+AC_PREREQ(2.69)
+AC_INIT(Nautilus-Sendto-ITS, 0.4, mbooth@fedoraproject.org, nautilus-sendto-its, https://github.com/mbooth101/nautilus-sendto-its)
+
+AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_SYSTEM
 AM_INIT_AUTOMAKE()
