@@ -1,5 +1,7 @@
 # nautilus-sendto-its
 
+![Screen Shot][ScreenShot]
+
 ## Supported ITSs
 
 * **Trac** - Trac version 0.11 or newer. Your Trac or Bloodhound instance must be running the XML-RPC plug-in.
@@ -32,4 +34,5 @@ Substituting <VERSION> for the desired version.
 
 This project is licenced under the [GNU GPL, Version 2][GPL2].
 
+[ScreenShot]: https://raw.github.com/mbooth101/nautilus-sendto-its/master/screenshot.png "Screenshot of nautilus-sendto-its in action."
 [GPL2]: http://www.gnu.org/licenses/old-licenses/gpl-2.0.txt
