@@ -1,6 +1,8 @@
 # nautilus-sendto-its
 
+## Supported ITSs
 
+* **Trac** - Trac version 0.11 or newer. Your Trac or Bloodhound instance must be running the XML-RPC plug-in.
 
 ## Building from Source
 
