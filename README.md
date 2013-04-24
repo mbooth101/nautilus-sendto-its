@@ -1,10 +1,12 @@
 # nautilus-sendto-its
 
+A plug-in for Nautilus, the file manager for the GNOME desktop environment, that allows the sending of any files or directories to an issue tracking system as ticket attachments.
+
 ![Screen Shot][ScreenShot]
 
 ## Supported ITSs
 
-* **Trac** - Trac version 0.11 or newer. Your Trac or Bloodhound instance must be running the XML-RPC plug-in.
+* **Trac** - Trac version 0.11 or newer. Your Trac instance must be running the XML-RPC plug-in.
 
 ## Building from Source
 
